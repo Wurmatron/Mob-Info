@@ -1,0 +1,68 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'com.diffplug.gradle.spotless' version '3.4.0'
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "${mod_version}"
+archivesBaseName = "Mob-Info"
+
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+    version = "${mc_version}-${forge_version}"
+    runDir = "run"
+    mappings = "${mcp_map}"
+    clientRunArgs += "--username=${username}"
+    mappings = "${mcp_map}"
+    replace "@VERSION@", project.version
+}
+
+repositories {
+    maven {
+        name = "CurseForge"
+        url = "https://minecraft.curseforge.com/api/maven/"
+    }
+}
+
+dependencies {
+   deobfCompile "craftstudio-api:CraftStudio-${craftstudioAPI_version}:mc1.12:alpha"
+   deobfCompile "animania:animania:1.12.2:${animania_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+spotless {
+    java {
+        removeUnusedImports()
+        indentWithSpaces()
+        trimTrailingWhitespace()
+        endWithNewline()
+        googleJavaFormat()
+    }
+}
