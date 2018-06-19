@@ -1,0 +1,16 @@
+[
+{
+  "modid": "mobinfo",
+  "name": "Mob Info",
+  "description": "Cosmetic Addon for Animania",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Wurmatron"],
+  "credits": "Purplicious_Cow for the creation of Animania",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
