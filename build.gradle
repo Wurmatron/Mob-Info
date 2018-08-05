@@ -32,15 +32,15 @@ minecraft {
 }
 
 repositories {
-    maven {
-        name = "CurseForge"
-        url = "https://minecraft.curseforge.com/api/maven/"
-    }
+//    maven {
+//        name = "CurseForge"
+//        url = "https://minecraft.curseforge.com/api/maven/"
+//    }
 }
 
 dependencies {
-   deobfCompile "craftstudio-api:CraftStudio-${craftstudioAPI_version}:mc1.12:alpha"
-   deobfCompile "animania:animania:1.12.2:${animania_version}"
+//   deobfCompile "craftstudio-api:CraftStudio-${craftstudioAPI_version}:mc1.12:alpha"
+//   deobfCompile "animania:animania:1.12.2:${animania_version}"
 }
 
 processResources {
