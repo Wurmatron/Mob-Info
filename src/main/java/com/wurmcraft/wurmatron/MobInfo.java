@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.input.Keyboard;
 
 @Mod(
   modid = MobInfo.MODID,
@@ -65,11 +66,18 @@ public class MobInfo {
                     float netHeadYaw,
                     float headPitch,
                     float scale) {
+                  boolean holdingShift =
+                      Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)
+                          || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
                   ItemStack displayItemFood = getDisplayFood(entityLiving);
                   ItemStack displayItem =
                       displayItemFood != ItemStack.EMPTY
                           ? displayItemFood
                           : getDisplayWater(entityLiving);
+                  if (!holdingShift && ConfigHandler.invertDisplay
+                      || holdingShift && !ConfigHandler.invertDisplay) {
+                    displayItem = ItemStack.EMPTY;
+                  }
                   if (displayItem != ItemStack.EMPTY) {
                     GlStateManager.pushMatrix();
                     GlStateManager.rotate(180, 0, 0, 1);
