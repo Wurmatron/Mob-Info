@@ -1,33 +1,27 @@
 package com.wurmcraft.wurmatron;
 
-import com.animania.common.entities.AnimaniaAnimal;
-import com.animania.common.entities.chickens.EntityAnimaniaChicken;
-import com.animania.common.entities.cows.EntityAnimaniaCow;
-import com.animania.common.entities.goats.EntityAnimaniaGoat;
-import com.animania.common.entities.horses.EntityAnimaniaHorse;
-import com.animania.common.entities.peacocks.EntityAnimaniaPeacock;
-import com.animania.common.entities.pigs.EntityAnimaniaPig;
-import com.animania.common.entities.rodents.EntityFerretBase;
-import com.animania.common.entities.rodents.EntityHamster;
-import com.animania.common.entities.rodents.EntityHedgehogBase;
-import com.animania.common.entities.sheep.EntityAnimaniaSheep;
-import com.animania.common.handler.ItemHandler;
+import static com.wurmcraft.wurmatron.RenderHelper.getDisplayFood;
+import static com.wurmcraft.wurmatron.RenderHelper.getDisplayWater;
+
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import org.lwjgl.input.Keyboard;
 
 @Mod(
@@ -43,8 +37,17 @@ public class MobInfo {
   public static final String NAME = "Mob Info";
   public static final String VERSION = "@VERSION@";
 
+  public static final KeyBinding KEY_TOGGLE =
+      new KeyBinding("key.mobInfo_toggle.name", Keyboard.KEY_LSHIFT, "category.mobInfo.name");
+  private boolean holdingKey = false;
+
   @EventHandler
-  public void init(FMLInitializationEvent event) {
+  public void preInit(FMLPreInitializationEvent e) {
+    ClientRegistry.registerKeyBinding(KEY_TOGGLE);
+  }
+
+  @EventHandler
+  public void init(FMLInitializationEvent e) {
     MinecraftForge.EVENT_BUS.register(this);
   }
 
@@ -66,16 +69,13 @@ public class MobInfo {
                     float netHeadYaw,
                     float headPitch,
                     float scale) {
-                  boolean holdingShift =
-                      Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)
-                          || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
                   ItemStack displayItemFood = getDisplayFood(entityLiving);
                   ItemStack displayItem =
                       displayItemFood != ItemStack.EMPTY
                           ? displayItemFood
                           : getDisplayWater(entityLiving);
-                  if (!holdingShift && ConfigHandler.invertDisplay
-                      || holdingShift && !ConfigHandler.invertDisplay) {
+                  if (!holdingKey && ConfigHandler.invertDisplay
+                      || holdingKey && !ConfigHandler.invertDisplay) {
                     displayItem = ItemStack.EMPTY;
                   }
                   if (displayItem != ItemStack.EMPTY) {
@@ -102,118 +102,10 @@ public class MobInfo {
     }
   }
 
-  private ItemStack getDisplayFood(EntityLivingBase entity) {
-    if (entity instanceof AnimaniaAnimal) {
-      if (entity instanceof EntityAnimaniaCow) {
-        EntityAnimaniaCow cow = (EntityAnimaniaCow) entity;
-        if (!cow.getFed()) {
-          return new ItemStack(Items.WHEAT, 1, 0);
-        }
-      } else if (entity instanceof EntityAnimaniaChicken) {
-        EntityAnimaniaChicken chicken = (EntityAnimaniaChicken) entity;
-        if (!chicken.getFed()) {
-          return new ItemStack(Items.WHEAT_SEEDS, 1, 0);
-        }
-      } else if (entity instanceof EntityAnimaniaGoat) {
-        EntityAnimaniaGoat goat = (EntityAnimaniaGoat) entity;
-        if (!goat.getFed()) {
-          return new ItemStack(Items.WHEAT, 1, 0);
-        }
-      } else if (entity instanceof EntityAnimaniaHorse) {
-        EntityAnimaniaHorse horse = (EntityAnimaniaHorse) entity;
-        if (!horse.getFed()) {
-          return new ItemStack(Items.APPLE, 1, 0);
-        }
-      } else if (entity instanceof EntityAnimaniaPeacock) {
-        EntityAnimaniaPeacock peacock = (EntityAnimaniaPeacock) entity;
-        if (!peacock.getFed()) {
-          return new ItemStack(Items.WHEAT_SEEDS, 1, 0);
-        }
-      } else if (entity instanceof EntityAnimaniaPig) {
-        EntityAnimaniaPig pig = (EntityAnimaniaPig) entity;
-        if (!pig.getFed()) {
-          return new ItemStack(Items.CARROT, 1, 0);
-        }
-      } else if (entity instanceof EntityFerretBase) {
-        EntityFerretBase ferret = (EntityFerretBase) entity;
-        if (!ferret.getFed()) {
-          return new ItemStack(Items.EGG, 1, 0);
-        }
-      } else if (entity instanceof EntityHamster) {
-        EntityHamster hamster = (EntityHamster) entity;
-        if (!hamster.getFed()) {
-          return new ItemStack(ItemHandler.hamsterFood, 1, 0);
-        }
-      } else if (entity instanceof EntityHedgehogBase) {
-        EntityHedgehogBase hamster = (EntityHedgehogBase) entity;
-        if (!hamster.getFed()) {
-          return new ItemStack(Items.CARROT, 1, 0);
-        }
-      } else if (entity instanceof EntityAnimaniaSheep) {
-        EntityAnimaniaSheep hamster = (EntityAnimaniaSheep) entity;
-        if (!hamster.getFed()) {
-          return new ItemStack(Items.WHEAT, 1, 0);
-        }
-      }
+  @SubscribeEvent
+  public void onKeyInput(KeyInputEvent e) {
+    if (KEY_TOGGLE.isPressed()) {
+      holdingKey = !holdingKey;
     }
-    return ItemStack.EMPTY;
-  }
-
-  private ItemStack getDisplayWater(EntityLivingBase entity) {
-    if (entity instanceof AnimaniaAnimal) {
-      ItemStack waterBucket = new ItemStack(Items.WATER_BUCKET, 1, 0);
-      if (entity instanceof EntityAnimaniaCow) {
-        EntityAnimaniaCow cow = (EntityAnimaniaCow) entity;
-        if (!cow.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityAnimaniaChicken) {
-        EntityAnimaniaChicken chicken = (EntityAnimaniaChicken) entity;
-        if (!chicken.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityAnimaniaGoat) {
-        EntityAnimaniaGoat goat = (EntityAnimaniaGoat) entity;
-        if (!goat.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityAnimaniaHorse) {
-        EntityAnimaniaHorse horse = (EntityAnimaniaHorse) entity;
-        if (!horse.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityAnimaniaPeacock) {
-        EntityAnimaniaPeacock peacock = (EntityAnimaniaPeacock) entity;
-        if (!peacock.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityAnimaniaPig) {
-        EntityAnimaniaPig pig = (EntityAnimaniaPig) entity;
-        if (!pig.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityFerretBase) {
-        EntityFerretBase ferret = (EntityFerretBase) entity;
-        if (!ferret.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityHamster) {
-        EntityHamster hamster = (EntityHamster) entity;
-        if (!hamster.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityHedgehogBase) {
-        EntityHedgehogBase hamster = (EntityHedgehogBase) entity;
-        if (!hamster.getWatered()) {
-          return waterBucket;
-        }
-      } else if (entity instanceof EntityAnimaniaSheep) {
-        EntityAnimaniaSheep hamster = (EntityAnimaniaSheep) entity;
-        if (!hamster.getWatered()) {
-          return waterBucket;
-        }
-      }
-    }
-    return ItemStack.EMPTY;
   }
 }

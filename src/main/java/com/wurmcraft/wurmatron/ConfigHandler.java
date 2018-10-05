@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = MobInfo.MODID)
 public class ConfigHandler {
 
-  @Config.Comment("Only display's info when you are holding shift")
+  @Config.Comment("Only display's info when you are holding keyBinding")
   public static boolean invertDisplay = false;
 
   @SubscribeEvent
