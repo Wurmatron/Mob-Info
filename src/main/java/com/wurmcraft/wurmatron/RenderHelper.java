@@ -1,10 +1,10 @@
 package com.wurmcraft.wurmatron;
 
-import com.animania.common.entities.AnimaniaAnimal;
 import com.animania.common.entities.chickens.EntityAnimaniaChicken;
 import com.animania.common.entities.cows.EntityAnimaniaCow;
 import com.animania.common.entities.goats.EntityAnimaniaGoat;
 import com.animania.common.entities.horses.EntityAnimaniaHorse;
+import com.animania.common.entities.interfaces.IAnimaniaAnimalBase;
 import com.animania.common.entities.peacocks.EntityAnimaniaPeacock;
 import com.animania.common.entities.pigs.EntityAnimaniaPig;
 import com.animania.common.entities.rodents.EntityFerretBase;
@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack;
 public class RenderHelper {
 
   public static ItemStack getDisplayFood(EntityLivingBase entity) {
-    if (entity instanceof AnimaniaAnimal) {
+    if (entity instanceof IAnimaniaAnimalBase) {
       if (entity instanceof EntityAnimaniaCow) {
         EntityAnimaniaCow cow = (EntityAnimaniaCow) entity;
         if (!cow.getFed()) {
@@ -76,7 +76,7 @@ public class RenderHelper {
   }
 
   public static ItemStack getDisplayWater(EntityLivingBase entity) {
-    if (entity instanceof AnimaniaAnimal) {
+    if (entity instanceof IAnimaniaAnimalBase) {
       ItemStack waterBucket = new ItemStack(Items.WATER_BUCKET, 1, 0);
       if (entity instanceof EntityAnimaniaCow) {
         EntityAnimaniaCow cow = (EntityAnimaniaCow) entity;
