@@ -25,12 +25,11 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import org.lwjgl.input.Keyboard;
 
 @Mod(
-  modid = MobInfo.MODID,
-  name = MobInfo.NAME,
-  version = MobInfo.VERSION,
-  clientSideOnly = true,
-  dependencies = "required-after:animania;"
-)
+    modid = MobInfo.MODID,
+    name = MobInfo.NAME,
+    version = MobInfo.VERSION,
+    clientSideOnly = true,
+    dependencies = "required-after:animania;")
 public class MobInfo {
 
   public static final String MODID = "mobinfo";

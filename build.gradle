@@ -1,68 +1,91 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
     }
 }
 
 plugins {
-    id 'com.diffplug.gradle.spotless' version '3.4.0'
+    id "com.github.johnrengelman.shadow" version "2.0.4"
+    id "com.diffplug.gradle.spotless" version "3.28.1"
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 
-version = "${mod_version}"
-archivesBaseName = "Mob-Info"
-
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+String build_number = System.getenv().BUILD_NUMBER
+if (build_number == null) {
+    build_number = "CustomBuild"
+} else {
+    build_number = "Jenkins-${build_number}"
 }
+version = "${mod_version}-${build_number}"
+
+group = 'io.wurmatron.mobinfo'
+archivesBaseName = 'MobInfo'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    version = "${mc_version}-${forge_version}"
-    runDir = "run"
-    mappings = "${mcp_map}"
-    clientRunArgs += "--username=${username}"
-    mappings = "${mcp_map}"
-    replace "@VERSION@", project.version
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    // makeObfSourceJar = false
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        server {
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
 }
 
 repositories {
-//    maven {
-//        name = "CurseForge"
-//        url = "https://minecraft.curseforge.com/api/maven/"
-//    }
+    maven {url = "https://www.cursemaven.com"}
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
-//   deobfCompile "craftstudio-api:CraftStudio-${craftstudioAPI_version}:mc1.12:alpha"
-//   deobfCompile "animania:animania:1.12.2:${animania_version}"
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
+    compile (name:'animania-1.12.2-base-2.0.3.28', ext:'jar')
+    compile (name:'CraftStudioAPI-universal-1.0.1.95-mc1.12-alpha', ext:'jar')
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
 
 spotless {
     java {
         removeUnusedImports()
         indentWithSpaces()
         trimTrailingWhitespace()
-        endWithNewline()
         googleJavaFormat()
     }
 }
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "mob-info",
+                "Specification-Vendor": "wurmatron",
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"Wurmatron",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('spotlessApply')
+jar.finalizedBy('shadowJar')
+jar.finalizedBy('reobfJar')

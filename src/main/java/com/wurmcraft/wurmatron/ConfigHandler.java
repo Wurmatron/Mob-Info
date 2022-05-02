@@ -13,6 +13,9 @@ public class ConfigHandler {
   @Config.Comment("Only display's info when you are holding keyBinding")
   public static boolean invertDisplay = false;
 
+  @Config.Comment("How long before a rendered item will update to the animals alternative")
+  public static int itemChangeInterval = 5;
+
   @SubscribeEvent
   public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
     if (event.getModID().equals(MobInfo.MODID)) {
